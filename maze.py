@@ -28,7 +28,7 @@ class Cell:
         if not to_delete in self.walls.keys():
             raise Wall_Not_Found_Exception('{} cannot be deleted. Not a valid wall'.format(to_delete))
 
-        self.walls.update({to_delete:True})
+        self.walls.update({to_delete:False})
 
     def set_wall(self,to_set):
 
@@ -51,6 +51,10 @@ class Cell:
 
         self.isEnd = True
 
+    def get_walls(self):
+
+        return self.walls
+
 
     def __str__(self):
 
@@ -66,6 +70,7 @@ class Maze:
     end:Cell
     mode:str
     cells:[]
+
 
     def __init__(self,height:int, width:int,mode:str):
 
@@ -83,15 +88,15 @@ class Maze:
 
         if self.mode == "depth_first":
             self.depth_first_generation()
+        elif self.mode == "test":
+            pass
 
 
     def depth_first_generation(self):
 
         # start at random cell
 
-        start = self.get_cell_by_number(random.randint(0,self.cell_count))
-
-
+        self.start = self.get_cell_by_number(random.randint(0,self.cell_count-1))
 
         def rec(cell):
 
@@ -107,10 +112,14 @@ class Maze:
             for n in neighbours:
                 if not n.visited:
                     connecting_wall = self.get_wall(cell,n)
-                    cell.delete_wall(cell,connecting_wall)
+                    self.delete_cell_wall(cell,connecting_wall[0])
+
+                    self.end = cell
+
                     rec(n)
 
-        rec(start)
+
+        rec(self.start)
 
 
     def delete_cell_wall(self,cell,wall):
@@ -119,21 +128,20 @@ class Maze:
             raise Wall_Not_Found_Exception("{} is not a valid wall".format(wall))
 
 
-        if not self.is_edge_cell(cell):
-            cell.delete_wall(wall)
-            xpos,ypos = cell.get_position()
+        cell.delete_wall(wall)
+        xpos,ypos = cell.get_position()
 
+        if wall == "T":
+            neighbour = self.get_cell(xpos,ypos-1)
+        elif wall == "B":
+            neighbour = self.get_cell(xpos,ypos+1)
+        elif wall == "R":
+            neighbour = self.get_cell(xpos+1,ypos)
+        else:
+            neighbour = self.get_cell(xpos-1,ypos)
 
-            if wall == "T":
-                neighbour = self.get_cell(xpos,ypos-1)
-            elif wall == "B":
-                neighbour = self.get_cell(xpos,ypos+1)
-            elif wall == "R":
-                neighbour = self.get_cell(xpos+1,ypos)
-            else:
-                neighbour = self.get_cell(xpos-1,ypos)
+        neighbour.delete_wall(self.ADJACENT_EDGES[wall])
 
-            neighbour.delete_wall(self.ADJACENT_EDGES[wall])
 
 
     def is_edge_cell(self,cell):
@@ -145,10 +153,6 @@ class Maze:
         else:
             return False
 
-
-
-
-
     def get_wall(self, cell, neighbour):
 
         xpos_c,ypos_c = cell.get_position()
@@ -158,9 +162,9 @@ class Maze:
             raise Not_Neighbour_Exception("Same cell")
 
         elif xpos_c == xpos_n: #neigbour on same column
-            if ypos_c + 1 == ypos_n:
+            if ypos_c - 1 == ypos_n:
                 return ("T","B")
-            elif ypos_c - 1 == ypos_n:
+            elif ypos_c + 1 == ypos_n:
                 return ("B","T")
             else:
                 raise Not_Neighbour_Exception("Cells are not neighbouring")
@@ -176,22 +180,65 @@ class Maze:
             raise Not_Neighbour_Exception("Cells are not neighbouring")
 
 
-
-
     def get_neighbours(self,cell):
 
         xpos, ypos = cell.get_position()
 
-        neighbours = [self.get_cell(xpos,ypos+1), #top
-                      self.get_cell(xpos+1,ypos), #right
-                      self.get_cell(xpos,ypos-1), #bottom
-                      self.get_cell(xpos-1,ypos-1)] #left
+        if not self.is_edge_cell(cell):
+            neighbours = [self.get_cell(xpos,ypos-1), #top
+                          self.get_cell(xpos+1,ypos), #right
+                          self.get_cell(xpos,ypos+1), #bottom
+                          self.get_cell(xpos-1,ypos)] #left
 
+        #Edge cases: 
+        elif ypos == 0:
+            if xpos == 0:
+                neighbours =    [self.get_cell(xpos+1,ypos), #right
+                                 self.get_cell(xpos,ypos+1), #bottom
+                                ]
+
+            elif  xpos == self.width -1: #corner right top, no right
+                neighbours = [self.get_cell(xpos, ypos+1),  # bottom
+                              self.get_cell(xpos-1, ypos)] # left
+
+            else: #top row, just no top position
+                neighbours = [self.get_cell(xpos+1, ypos),  # right
+                              self.get_cell(xpos, ypos + 1),  # bottom
+                              self.get_cell(xpos-1, ypos)] #left
+
+
+        elif xpos == 0:
+            if ypos == self.height - 1:
+                neighbours = [self.get_cell(xpos, ypos-1), #top
+                              self.get_cell(xpos+1, ypos)]  # right
+            else:
+                neighbours = [self.get_cell(xpos, ypos-1),  # top
+                              self.get_cell(xpos+1, ypos),  # right
+                              self.get_cell(xpos, ypos+1)]  # bottom
+
+
+        elif ypos == self.height-1:
+
+
+            if xpos == self.width -1:
+                neighbours = [self.get_cell(xpos,ypos-1), #top
+                              self.get_cell(xpos-1,ypos)] #left
+
+            else:
+                neighbours = [self.get_cell(xpos, ypos-1),  # top
+                              self.get_cell(xpos+1, ypos),  # right
+                              self.get_cell(xpos-1, ypos)]  # left
+
+        elif xpos == self.width-1:
+
+            neighbours = [self.get_cell(xpos, ypos-1),  # top
+                         self.get_cell(xpos, ypos+1),  # bottom
+                         self.get_cell(xpos-1, ypos)]  # left
+
+        else:
+            print(ypos)
+            print(xpos)
         return neighbours
-
-
-
-
 
 
     def get_cell(self,xpos,ypos):
@@ -213,7 +260,8 @@ class Maze:
     def create_solution_path(self):
         pass
 
-
+    def print(self):
+        pass
 
     def __str__(self):
         tmp = ""
@@ -222,12 +270,11 @@ class Maze:
         return tmp
 
 
-
 if __name__ == '__main__':
 
-    maze = Maze(4,10,"depth_first")
-    maze.get_cell_by_number(33)
-    print(maze)
+    maze = Maze(4,4,"depth_first")
+
+
 
 
 
