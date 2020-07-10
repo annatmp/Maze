@@ -114,7 +114,7 @@ class Maze:
                     connecting_wall = self.get_wall(cell,n)
                     self.delete_cell_wall(cell,connecting_wall[0])
 
-                    self.end = cell
+                    self.end = n
 
                     rec(n)
 
@@ -190,7 +190,7 @@ class Maze:
                           self.get_cell(xpos,ypos+1), #bottom
                           self.get_cell(xpos-1,ypos)] #left
 
-        #Edge cases: 
+        #Edge cases:
         elif ypos == 0:
             if xpos == 0:
                 neighbours =    [self.get_cell(xpos+1,ypos), #right
@@ -229,15 +229,13 @@ class Maze:
                               self.get_cell(xpos+1, ypos),  # right
                               self.get_cell(xpos-1, ypos)]  # left
 
-        elif xpos == self.width-1:
+        else:
 
             neighbours = [self.get_cell(xpos, ypos-1),  # top
                          self.get_cell(xpos, ypos+1),  # bottom
                          self.get_cell(xpos-1, ypos)]  # left
 
-        else:
-            print(ypos)
-            print(xpos)
+
         return neighbours
 
 
@@ -261,7 +259,8 @@ class Maze:
         pass
 
     def print(self):
-        pass
+        printer = Maze_printer(self.cells, self.start,self.end)
+        printer.print()
 
     def __str__(self):
         tmp = ""
@@ -269,10 +268,68 @@ class Maze:
             tmp += (" ".join(str(cell) for cell in row)) + '\n'
         return tmp
 
+class Maze_printer:
+
+    maze:Maze
+
+    def __init__(self,maze_cells,start,end):
+
+        self.maze = maze_cells
+        self.maze_height = len(self.maze)
+        self.maze_width = len(self.maze[0])
+        self.start = start
+        self.end = end
+
+    def translate_to_string(self):
+
+        representation = ""
+
+        #top row
+        representation += "".join(["+---" for i in range(self.maze_width)])
+        representation += "+\n"
+
+        #always append the right and bottom wall
+        for index,row in enumerate(self.maze):
+
+            vert = ["|"] #vertical lines
+            hor = ["+"] #horizontal lines
+            for cell in row:
+                walls = cell.get_walls()
+
+                if self.start == cell:
+                    x = "o"
+                elif self.end == cell:
+                    x = "x"
+
+                else:
+                    x = " "
+
+                if walls["R"]:
+                    vert.append(" {} |".format(x))
+                else:
+                    vert.append(" {}  ".format(x))
+
+                if walls["B"]:
+                    hor.append("---+")
+                else:
+                    hor.append("   +")
+
+            representation += "".join(vert)
+            representation += "\n"
+            representation += "".join(hor)
+            representation += "\n"
+
+        return representation
+
+    def print(self):
+
+        print(self.translate_to_string())
+
 
 if __name__ == '__main__':
 
     maze = Maze(4,4,"depth_first")
+    maze.print()
 
 
 
