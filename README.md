@@ -35,3 +35,5 @@ Currently only supports basic console printing:
 - More generation algorithm
 - Maze solving using different algorithms
 - more appealing GUI 
+
+

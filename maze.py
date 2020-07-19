@@ -1,10 +1,14 @@
 import random
 
 
+
 class Wall_Not_Found_Exception(Exception):
     pass
 
 class Not_Neighbour_Exception(Exception):
+    pass
+
+class Size_Limit_Exception(Exception):
     pass
 
 class Cell:
@@ -56,6 +60,7 @@ class Cell:
         return self.walls
 
 
+
     def __str__(self):
 
         return "{}/{}".format(self.xpos,self.ypos)
@@ -74,6 +79,9 @@ class Maze:
 
     def __init__(self,height:int, width:int,mode:str):
 
+
+        if height > 40 or width > 40:
+            raise Size_Limit_Exception("Maze size must be smaler than 40")
         self.height = height
         self.width = width
         self.mode = mode
@@ -250,6 +258,10 @@ class Maze:
 
         return self.get_cell(x, y)
 
+    def get_size(self):
+
+        return (self.width,self.height)
+
 
 
 
@@ -257,6 +269,15 @@ class Maze:
 
     def create_solution_path(self):
         pass
+
+    def get_cells(self):
+        return self.cells
+
+    def get_start(self):
+        return self.start
+
+    def get_end(self):
+        return self.end
 
     def print(self):
         printer = Maze_printer(self.cells, self.start,self.end)
@@ -328,8 +349,8 @@ class Maze_printer:
 
 if __name__ == '__main__':
 
-    maze = Maze(4,4,"depth_first")
-    maze.print()
+    maze = Maze(20,20,"depth_first")
+
 
 
 
