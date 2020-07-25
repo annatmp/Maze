@@ -140,6 +140,7 @@ class Maze:
                 cell = new_cell
                 not_seen_neigbours = not_seen_prev_neigbours
 
+
             # delete the connecting wall between cell and not visited neighbour
             adjacent = random.choice(not_seen_neigbours)
             connecting_wall = self.get_wall(cell, adjacent)
@@ -157,6 +158,8 @@ class Maze:
         path.sort(key=lambda x:x[1])
 
         self.end = path[-1][0]
+        self.path_length = path[-1][1]
+
 
         print(self.end)
 
@@ -305,6 +308,14 @@ class Maze:
     def print(self):
         printer = Maze_printer(self.cells, self.start,self.end)
         printer.print()
+
+    def get_mode_as_nice_string(self):
+        mode_low_cap = self.mode.replace("_", " ")
+        mode_all_cap = " ".join([word.capitalize() for word in mode_low_cap.split(" ")])
+        return mode_all_cap
+
+    def get_path_length(self):
+        return self.path_length
 
     def __str__(self):
         tmp = ""
