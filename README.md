@@ -32,7 +32,7 @@ Basic Print Option
 ```
 
 and a basic GUI
-<img src="https://imgur.com/LXRYVTb" alt="Maze GUI">
+<a href="https://imgur.com/LXRYVTb"><img src="https://i.imgur.com/LXRYVTb.png" title="source: imgur.com" /></a>
 
 
 ## Roadmap:
