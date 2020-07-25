@@ -1,7 +1,6 @@
 import random
 
 
-
 class Wall_Not_Found_Exception(Exception):
     pass
 
@@ -75,13 +74,12 @@ class Maze:
     end:Cell
     mode:str
     cells:[]
-
+    SIZE_LIMIT = 30
 
     def __init__(self,height:int, width:int,mode:str):
 
-
-        if height > 40 or width > 40:
-            raise Size_Limit_Exception("Maze size must be smaler than 40")
+        if height > self.SIZE_LIMIT or width > self.SIZE_LIMIT :
+            raise Size_Limit_Exception("Maze size may not be bigger than {}".format(self.SIZE_LIMIT))
         self.height = height
         self.width = width
         self.mode = mode
@@ -93,41 +91,76 @@ class Maze:
 
         self.cells=[[Cell(x,y) for x in range(0,self.width)] for y in range(0,self.height)]
 
-
         if self.mode == "depth_first":
             self.depth_first_generation()
+
         elif self.mode == "test":
             pass
-
 
     def depth_first_generation(self):
 
         # start at random cell
+        all_cells = [cell for cell in [row for row in self.cells]]
+        random_cell = random.choice(all_cells)
+        self.start = self.cells[0][0]
+        queue = []
+        path = []
 
-        self.start = self.get_cell_by_number(random.randint(0,self.cell_count-1))
-
-        def rec(cell):
-
-            if cell.visited:
-                return
-
-
+        def rec(cell, path_length):
+            #mark visited
             cell.set_visited()
-            neighbours = self.get_neighbours(cell)
+            # push to queue
+            queue.append(cell)
+            # Get all non_visited neighbours
+            not_seen_neigbours = [neighbour for neighbour in self.get_neighbours(cell) if not neighbour.visited]
 
-            random.shuffle(neighbours)
+            # if there is none
+            if len(not_seen_neigbours) == 0:
 
-            for n in neighbours:
-                if not n.visited:
-                    connecting_wall = self.get_wall(cell,n)
-                    self.delete_cell_wall(cell,connecting_wall[0])
-
-                    self.end = n
-
-                    rec(n)
+                if len(queue) == 0:
+                    return
 
 
-        rec(self.start)
+                new_cell = queue.pop()
+                path_length -= 1
+                not_seen_prev_neigbours = [neighbour for neighbour in self.get_neighbours(new_cell)
+                                           if not neighbour.visited]
+
+                while (len(not_seen_prev_neigbours) == 0):
+
+                    if len(queue) == 0:
+                        return
+
+
+                    new_cell = queue.pop()
+                    path_length -= 1
+                    not_seen_prev_neigbours = [neighbour for neighbour in self.get_neighbours(new_cell)
+                                               if not neighbour.visited]
+
+                cell = new_cell
+                not_seen_neigbours = not_seen_prev_neigbours
+
+            # delete the connecting wall between cell and not visited neighbour
+            adjacent = random.choice(not_seen_neigbours)
+            connecting_wall = self.get_wall(cell, adjacent)
+            self.delete_cell_wall(cell, connecting_wall[0])
+
+            # update path and start new
+            path_length += 1
+            path.append((adjacent,path_length))
+            rec(adjacent,path_length)
+
+
+        rec(self.start,0)
+        #print("".join(["{}\n".format(cell) for cell in path]))
+
+        path.sort(key=lambda x:x[1])
+
+        self.end = path[-1][0]
+        self.path_length = path[-1][1]
+
+        print(self.end)
+
 
 
     def delete_cell_wall(self,cell,wall):
@@ -149,8 +182,6 @@ class Maze:
             neighbour = self.get_cell(xpos-1,ypos)
 
         neighbour.delete_wall(self.ADJACENT_EDGES[wall])
-
-
 
     def is_edge_cell(self,cell):
 
@@ -186,7 +217,6 @@ class Maze:
                 raise Not_Neighbour_Exception("Cells are not neighbouring")
         else:
             raise Not_Neighbour_Exception("Cells are not neighbouring")
-
 
     def get_neighbours(self,cell):
 
@@ -246,7 +276,6 @@ class Maze:
 
         return neighbours
 
-
     def get_cell(self,xpos,ypos):
 
         return self.cells[ypos][xpos]
@@ -261,11 +290,6 @@ class Maze:
     def get_size(self):
 
         return (self.width,self.height)
-
-
-
-
-
 
     def create_solution_path(self):
         pass
@@ -283,6 +307,14 @@ class Maze:
         printer = Maze_printer(self.cells, self.start,self.end)
         printer.print()
 
+    def get_mode_as_nice_string(self):
+        mode_low_cap = self.mode.replace("_", " ")
+        mode_all_cap = " ".join([word.capitalize() for word in mode_low_cap.split(" ")])
+        return mode_all_cap
+
+    def get_path_length(self):
+        return self.path_length
+
     def __str__(self):
         tmp = ""
         for row in self.cells:
@@ -293,10 +325,10 @@ class Maze_printer:
 
     maze:Maze
 
-    def __init__(self,maze_cells,start,end):
+    def __init__(self,maze_cells:list,start,end):
 
         self.maze = maze_cells
-        self.maze_height = len(self.maze)
+        self.maze_height = len(self.maze[1])
         self.maze_width = len(self.maze[0])
         self.start = start
         self.end = end
