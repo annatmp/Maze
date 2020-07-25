@@ -32,12 +32,14 @@ Basic Print Option
 ```
 
 and a basic GUI
+
 <a href="https://imgur.com/LXRYVTb"><img src="https://i.imgur.com/LXRYVTb.png" title="source: imgur.com" /></a>
 
 
 ## Roadmap:
 - More generation algorithm
 - Maze solving using different algorithms
+
 [x] more appealing GUI
 
 
