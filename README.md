@@ -2,7 +2,7 @@
 
 Maze generator algorithm, generates perfect maze through recursion (depth first search)
 
-Currently only supports basic console printing:
+Basic Print Option 
 `o` start
 `x` end
 
@@ -31,9 +31,13 @@ Currently only supports basic console printing:
 
 ```
 
-##Roadmap:
+and a basic GUI
+<img src="https://imgur.com/a/OxyhqTi" alt="Maze GUI">
+
+
+## Roadmap:
 - More generation algorithm
 - Maze solving using different algorithms
-- more appealing GUI 
+[x] more appealing GUI
 
 
