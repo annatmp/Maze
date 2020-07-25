@@ -140,6 +140,7 @@ class Maze:
                 cell = new_cell
                 not_seen_neigbours = not_seen_prev_neigbours
 
+
             # delete the connecting wall between cell and not visited neighbour
             adjacent = random.choice(not_seen_neigbours)
             connecting_wall = self.get_wall(cell, adjacent)
@@ -158,6 +159,7 @@ class Maze:
 
         self.end = path[-1][0]
         self.path_length = path[-1][1]
+
 
         print(self.end)
 
