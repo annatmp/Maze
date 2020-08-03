@@ -93,53 +93,6 @@ class LandingScreen(QWidget):
         self.setPalette(palette)
 
 
-class MainGameScreen(QWidget):
-
-    def __init__(self, parent: QMainWindow, maze, controller: Controller):
-        """
-
-        :type parent: QMainWindow
-        """
-        super(MainGameScreen, self).__init__(parent)
-        self.maze = maze
-        self.parent = parent
-        self.controller = controller
-        self.min_size = QSize(600, 600)
-
-        # Generate children widgets'
-
-        self.maze_canvas = MazeCanvas(self, maze)
-
-        # Return home button
-        self.return_to_home = QPushButton("Return to home screen")
-        self.return_to_home.adjustSize()
-        self.return_to_home.clicked.connect(self.controller.load_main_screen)
-
-        self.info_header = MazeScreenHeader(self, maze.get_mode_as_nice_string(), maze.get_path_length(), False)
-
-        self.layout = QGridLayout()
-        self.layout.addWidget(self.info_header, 0, 0, 1, 3)
-        self.layout.addWidget(self.maze_canvas, 1, 0, 1, 3, Qt.AlignCenter)
-        self.layout.addWidget(self.return_to_home, 2, 1, Qt.AlignCenter)
-        self.setLayout(self.layout)
-
-        self.colour_styling()
-        self.adjustSize()
-
-        self.show()
-
-    def colour_styling(self):
-        self.setAutoFillBackground(True)
-        palette = self.palette()
-        palette.setColor(QPalette.Window, MAIN_BACKGROUND)
-        self.setPalette(palette)
-
-    def resizeEvent(self, a0: QResizeEvent) -> None:
-        self.layout.setAlignment(self.info_header, Qt.AlignCenter)
-        self.setMinimumSize(int(self.parent.size().width() * 0.8), int(self.parent.size().height() * 0.8))
-        self.maze_canvas.resizeEvent(a0)
-
-
 class MazeScreenHeader(QWidget):
     """
     Header to be displayed above the maze. Gives basic information about the generated maze
@@ -270,6 +223,51 @@ class OptionDropdown(QComboBox):
     def styling(self):
         pass
 
+class MainGameScreen(QWidget):
+
+    def __init__(self, parent: QMainWindow, maze, controller: Controller):
+        """
+
+        :type parent: QMainWindow
+        """
+        super(MainGameScreen, self).__init__(parent)
+        self.maze = maze
+        self.parent = parent
+        self.controller = controller
+        self.min_size = QSize(600, 600)
+
+        # Generate children widgets'
+
+        self.maze_canvas = MazeCanvas(self, maze)
+
+        # Return home button
+        self.return_to_home = QPushButton("Return to home screen")
+        self.return_to_home.adjustSize()
+        self.return_to_home.clicked.connect(self.controller.load_main_screen)
+
+        self.info_header = MazeScreenHeader(self, maze.get_mode_as_nice_string(), maze.get_path_length(), False)
+
+        self.layout = QGridLayout()
+        self.layout.addWidget(self.info_header, 0, 0, 1, 3)
+        self.layout.addWidget(self.maze_canvas, 1, 0, 1, 3, Qt.AlignCenter)
+        self.layout.addWidget(self.return_to_home, 2, 1, Qt.AlignCenter)
+        self.setLayout(self.layout)
+
+        self.colour_styling()
+        self.adjustSize()
+
+        self.show()
+
+    def colour_styling(self):
+        self.setAutoFillBackground(True)
+        palette = self.palette()
+        palette.setColor(QPalette.Window, MAIN_BACKGROUND)
+        self.setPalette(palette)
+
+    def resizeEvent(self, a0: QResizeEvent) -> None:
+        self.layout.setAlignment(self.info_header, Qt.AlignCenter)
+        self.setMinimumSize(int(self.parent.size().width() * 0.8), int(self.parent.size().height() * 0.8))
+        self.maze_canvas.resizeEvent(a0)
 
 class MazeCanvas(QLabel):
 
@@ -285,7 +283,7 @@ class MazeCanvas(QLabel):
         self.maze = maze
         self.maze_size = maze.get_size()
 
-        maze_canvas = QPixmap(self.scale(self.maze_size[0]), self.scale(self.maze_size[0]))
+        maze_canvas = QPixmap(self.scale(self.maze_size[0]), self.scale(self.maze_size[1]))
         maze_canvas.fill(PURPLE)
 
         self.setPixmap(maze_canvas)
