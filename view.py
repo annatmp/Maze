@@ -339,24 +339,39 @@ class MazeCanvas(QLabel):
                     lines.append(left_line)
                     painter.drawLine(left_line)
 
-        # draw start point
-        start_pos = self.maze.get_start().get_position()
 
-        start_top_left = QPoint(self.scale(start_pos[0]) + 2, self.scale(start_pos[1]) + 2)
-        start_bottom_right = QPoint(self.scale(start_pos[0] + 1) - 2, self.scale(start_pos[1] + 1) - 2)
 
-        rect = QRect(start_top_left, start_bottom_right)
-        start = QPixmap("assets/streetview.png")
-
-        painter.drawPixmap(rect, start)
 
         # draw end point
+
+
+
+        painter.setBrush(QBrush(QColor(DARK_GREY), Qt.SolidPattern))
+        end_pen = QPen(QColor(DARK_GREY), 3, Qt.SolidLine)
+        end_pen.setCapStyle(Qt.FlatCap)
+        painter.setPen(end_pen)
+
         end_pos = self.maze.get_end().get_position()
 
-        end_top_left = QPoint(self.scale(end_pos[0]) + 5, self.scale(end_pos[1]) + 5)
-        end_bottom_right = QPoint(self.scale(end_pos[0] + 1) - 5, self.scale(end_pos[1] + 1) - 5)
+        end_top_left = QPoint(self.scale(end_pos[0]+0.25), self.scale(end_pos[1]+0.25))
+        end_bottom_right = QPoint(self.scale(end_pos[0] + 0.75), self.scale(end_pos[1]+ 0.75))
 
-        rect = QRect(end_top_left, end_bottom_right)
-        end = QPixmap("assets/target.png")
+        end = QRect(end_top_left, end_bottom_right)
 
-        painter.drawPixmap(rect, end)
+        painter.drawEllipse(end)
+
+        # draw start point
+
+        painter.setBrush(QBrush(QColor(MAIN_BACKGROUND), Qt.SolidPattern))
+        start_pen = QPen(QColor(MAIN_BACKGROUND), 3, Qt.SolidLine)
+        start_pen.setCapStyle(Qt.SquareCap)
+        painter.setPen(start_pen)
+
+        start_pos = self.maze.get_start().get_position()
+
+        start_top_left = QPoint(self.scale(start_pos[0] + 0.25), self.scale(start_pos[1] + 0.25))
+        start_bottom_right = QPoint(self.scale(start_pos[0] + 0.75), self.scale(start_pos[1] + 0.75))
+
+        start = QRect(start_top_left, start_bottom_right)
+
+        painter.drawEllipse(start)
