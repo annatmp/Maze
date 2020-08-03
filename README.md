@@ -40,6 +40,7 @@ and a basic GUI
 - More generation algorithm
 - Maze solving using different algorithms
 
-[x] more appealing GUI
+
+\[x\] more appealing GUI
 
 
