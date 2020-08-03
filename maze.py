@@ -67,23 +67,20 @@ class Cell:
 
 class Maze:
 
-    ADJACENT_EDGES = {"T": "B", "R": "L", "B": "T", "L": "R"}
-    height:int
-    length:int
-    start:Cell
-    end:Cell
-    mode:str
-    cells:[]
+    GENERATION_ALGORITHMS = ["depth_first"]
+    SOLVING_ALGORITHMS = ["test"]
     SIZE_LIMIT = 30
 
-    def __init__(self,height:int, width:int,mode:str):
+    def __init__(self, height:int, width:int, generation_mode:str, solving_strategy:str=False):
 
         if height > self.SIZE_LIMIT or width > self.SIZE_LIMIT :
             raise Size_Limit_Exception("Maze size may not be bigger than {}".format(self.SIZE_LIMIT))
         self.height = height
         self.width = width
-        self.mode = mode
+        self.mode = generation_mode
         self.cell_count = height*width
+        self.cells = []
+        self.ADJACENT_EDGES = {"T": "B", "R": "L", "B": "T", "L": "R"}
 
         self.generate()
 
@@ -162,8 +159,6 @@ class Maze:
 
 
         print(self.end)
-
-
 
     def delete_cell_wall(self,cell,wall):
 
@@ -317,6 +312,20 @@ class Maze:
     def get_path_length(self):
         return self.path_length
 
+    # @staticmethod
+    # def supported_generation_mode():
+    #
+    #     return GENERATION_ALGORITHMS
+
+
+    def __len__(self):
+        """
+        len of a maze is its number of cells
+        :return:
+        """
+        return self.width * self.height
+
+
     def __str__(self):
         tmp = ""
         for row in self.cells:
@@ -379,6 +388,7 @@ class Maze_printer:
     def print(self):
 
         print(self.translate_to_string())
+
 
 
 if __name__ == '__main__':
