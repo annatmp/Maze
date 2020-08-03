@@ -33,7 +33,7 @@ Basic Print Option
 
 and a basic GUI
 
-<a href="https://imgur.com/LXRYVTb"><img src="https://i.imgur.com/LXRYVTb.png" title="source: imgur.com" /></a>
+<a href="https://i.imgur.com/Gr7JpiB.png"><img src="https://i.imgur.com/Gr7JpiB.png" title="source: imgur.com" /></a>
 
 
 ## Roadmap:
