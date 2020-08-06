@@ -1,4 +1,5 @@
 import random
+import sys
 
 
 class Wall_Not_Found_Exception(Exception):
@@ -22,7 +23,6 @@ class Cell:
         self.ypos = ypos
         self.visited = False #needed for generation
         self.isEnd = False
-
         self.walls = {"T": True, "B": True, "R": True, "L": True}
 
 
@@ -54,9 +54,12 @@ class Cell:
 
         self.isEnd = True
 
-    def get_walls(self):
 
-        return self.walls
+    def get_walls(self):
+       """
+       @return walls, dict
+       """
+       return self.walls
 
 
 
@@ -71,7 +74,7 @@ class Maze:
     SOLVING_ALGORITHMS = ["test"]
     SIZE_LIMIT = 30
 
-    def __init__(self, height:int, width:int, generation_mode:str, solving_strategy:str=False):
+    def __init__(self, height:int, width:int, generation_mode:str):
 
         if height > self.SIZE_LIMIT or width > self.SIZE_LIMIT :
             raise Size_Limit_Exception("Maze size may not be bigger than {}".format(self.SIZE_LIMIT))
@@ -84,9 +87,11 @@ class Maze:
 
         self.generate()
 
+
+
     def generate(self):
 
-        self.cells=[[Cell(x,y) for x in range(0,self.width)] for y in range(0,self.height)]
+        self.cells=[[Cell(x,y) for x in range(self.width)] for y in range(self.height)]
 
         if self.mode == "depth_first":
             self.depth_first_generation()
@@ -155,6 +160,7 @@ class Maze:
         path.sort(key=lambda x:x[1])
 
         self.end = path[-1][0]
+        self.end.set_end_cell()
         self.path_length = path[-1][1]
 
 
@@ -190,8 +196,10 @@ class Maze:
             return False
 
     def get_wall(self, cell, neighbour):
-
-        xpos_c,ypos_c = cell.get_position()
+        """
+        @return: adjacent walls
+        """
+        xpos_c, ypos_c = cell.get_position()
         xpos_n, ypos_n = neighbour.get_position()
 
         if  xpos_c == xpos_n and ypos_c == ypos_n:
@@ -215,6 +223,22 @@ class Maze:
         else:
             raise Not_Neighbour_Exception("Cells are not neighbouring")
 
+    def get_neighbour_by_direction(self,cell:Cell, direction):
+        #todo check that it is not the edge position
+        position = cell.get_position()
+        if direction == "T":
+            neighbour = self.get_cell(position[0], position[1]-1)
+        elif direction == "B":
+            neighbour = self.get_cell(position[0], position[1]+1)
+        elif direction == "R":
+            neighbour = self.get_cell(position[0]-1, position[1])
+        elif direction == "L":
+            neighbour = self.get_cell(position[0]+1, position[1])
+        else:
+            neighbour = None
+
+        return neighbour
+
     def get_neighbours(self,cell):
 
         xpos, ypos = cell.get_position()
@@ -226,8 +250,8 @@ class Maze:
                           self.get_cell(xpos-1,ypos)] #left
 
         #Edge cases:
-        elif ypos == 0:
-            if xpos == 0:
+        elif ypos == 0: # top row
+            if xpos == 0: #0,0
                 neighbours =    [self.get_cell(xpos+1,ypos), #right
                                  self.get_cell(xpos,ypos+1), #bottom
                                 ]
@@ -274,7 +298,8 @@ class Maze:
         return neighbours
 
     def get_cell(self,xpos,ypos):
-
+        #this does run counterintuitive since the first number gives the row (and thus y coordinate) and
+        # the second number the column (x coordinate)
         return self.cells[ypos][xpos]
 
     def get_cell_by_number(self,number):
@@ -287,7 +312,7 @@ class Maze:
     def get_size(self):
 
         return (self.width,self.height)
-
+  
     def create_solution_path(self):
         pass
 
@@ -388,17 +413,6 @@ class Maze_printer:
     def print(self):
 
         print(self.translate_to_string())
-
-
-
-if __name__ == '__main__':
-
-    maze = Maze(20,20,"depth_first")
-
-
-
-
-
 
 
 
