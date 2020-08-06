@@ -1,68 +1,101 @@
 from maze import Maze
 import random
 from Cell import Cell
+from Maze_Exceptions import No_Solution_Found_Exception
+from Maze_Walk import Maze_Walk
+
+def get_possible_directions(cell: Cell):
+    walls = cell.get_walls()
+    possible_directions = [direction for direction, wall in walls.items() if not wall]
+    return possible_directions
+
 
 class Maze_Solver:
 
+    def __init__(self,maze):
+
+        self.maze = maze
+        self.walker = Maze_Walk(self.maze.get_start())
+
+
+    def get_not_visited_neighbours_by_directions(self, cell, directions):
+
+        valid_neighbours = {}
+        for direction in directions:
+            neighbour = self.maze.get_neighbour_by_direction(cell, direction)
+            if not self.walker.was_visited(neighbour):
+                valid_neighbours.update({direction: neighbour})
+
+        return valid_neighbours
+
+    def get_solution(self):
+        return self.walker.full_solution_path()
+
+
+
+
+
+class Random_Solver(Maze_Solver):
+
     SOLVING_ALGORITHMS = ["random"]
 
-    def __init__(self,maze:Maze,solving_strategy):
-        self.maze = maze
-        self.execute_strategy = {"random" : self.random_search,"wall_flower" : self.wall_flower}
-        self.execute_strategy[solving_strategy]()
+    def __init__(self,maze:Maze):
+        super(Random_Solver, self).__init__(maze)
+        self.solve()
 
-    def random_search(self):
+
+    def solve(self):
         """
         random maze solving, backtracks when hitting a wall. Stores the "dead" ends
         UNINFORMED!
         """
-        print("enter random search")
         path = []
-        dead_ends = []
+
 
         # get the details from the maze
         start = self.maze.get_start()
         assert(isinstance(start,Cell))
 
         #set start as the first cell in the path
-        path.append(start)
 
-        def move(path, dead_ends):
+        def move():
             #import pdb; pdb.set_trace()
-            possible_directions = self.get_possible_directions(path[-1])
-            if len(possible_directions) == 1 and not len(path) == 1:
+            current = self.walker.get_current()
+            possible_directions = get_possible_directions(current)
+
+            if len(possible_directions) == 1 and not self.walker.is_at_start():
                 # if we are not at the start and there is only one way to go, we are in a dead end.
-                dead_ends.append(path.pop())
-                move(path,dead_ends)
+                self.walker.turn_back()
+                move()
             else:
                 #check if any of the direction is a dead end
-                not_visited_directions = [cell for cell in possible_directions if cell not in dead_ends]
-                if len(not_visited_directions) == 0:
+                valid_neighbours = self.get_not_visited_neighbours_by_directions(current, possible_directions)
+
+                if len(valid_neighbours) == 0:
                     #continue to backtrack
-                    dead_ends.append(path.pop())
-                    move(path,dead_ends)
+                    self.walker.turn_back()
+
+                    if self.walker.is_at_start():
+                        raise No_Solution_Found_Exception("Returned to Start without new options")
+                    move()
 
                 else:
-                    direction = random.choice(not_visited_directions)
+                    direction = random.choice(list(valid_neighbours.keys()))
+                    neighbour = valid_neighbours[direction]
 
-                    neighbour = self.maze.get_neighbour_by_direction(path[-1],direction)
-                    path.append(neighbour)
+                    self.walker.walk(neighbour, direction)
+
                     #check if cell is end cell
                     if neighbour.isEnd:
                         print("Found solution")
-                        return path, dead_ends
+                        return
+
                     else:
-                        print(neighbour)
-                        move(path, dead_ends)
+                        move()
+
 
         # start moving
-        move(path,dead_ends)
+        move()
 
 
-    def get_possible_directions(self,cell:Cell):
-        walls = cell.get_walls()
-        possible_directions = [direction for direction,wall in walls.items() if not wall]
-        return possible_directions
 
-    def wall_flower(self):
-        pass

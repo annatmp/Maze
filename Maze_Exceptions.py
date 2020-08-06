@@ -6,3 +6,9 @@ class Not_Neighbour_Exception(Exception):
 
 class Size_Limit_Exception(Exception):
     pass
+
+class No_Solution_Found_Exception(Exception):
+    pass
+
+class Invalid_Direction_Exception(Exception):
+    pass
