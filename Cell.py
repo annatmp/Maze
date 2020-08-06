@@ -16,7 +16,7 @@ class Cell:
 
 
     def delete_wall(self,to_delete):
-        
+
         if not to_delete in self.walls.keys():
             raise Wall_Not_Found_Exception('{} cannot be deleted. Not a valid wall'.format(to_delete))
 
