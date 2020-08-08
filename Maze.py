@@ -10,6 +10,7 @@ class Maze:
 
     GENERATION_ALGORITHMS = ["depth_first"]
     SIZE_LIMIT = 30
+    ADJACENT_EDGES = {"T": "B", "R": "L", "B": "T", "L": "R"}
 
     def __init__(self, height:int, width:int, generation_mode:str):
 
@@ -20,7 +21,7 @@ class Maze:
         self.mode = generation_mode
         self.cell_count = height*width
         self.cells = []
-        self.ADJACENT_EDGES = {"T": "B", "R": "L", "B": "T", "L": "R"}
+
 
         self.generate()
 
@@ -168,9 +169,9 @@ class Maze:
         elif direction == "B":
             neighbour = self.get_cell(position[0], position[1]+1)
         elif direction == "R":
-            neighbour = self.get_cell(position[0]-1, position[1])
-        elif direction == "L":
             neighbour = self.get_cell(position[0]+1, position[1])
+        elif direction == "L":
+            neighbour = self.get_cell(position[0]-1, position[1])
         else:
             neighbour = None
 
@@ -259,8 +260,14 @@ class Maze:
     def get_start(self):
         return self.start
 
+    def get_start_position(self):
+        return self.start.get_position()
+
     def get_end(self):
         return self.end
+
+    def get_end_position(self):
+        return self.end.get_position()
 
     def print(self):
         printer = Maze_printer(self.cells, self.start,self.end)
