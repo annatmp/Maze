@@ -2,7 +2,7 @@ import sys
 
 from PyQt5.QtWidgets import QApplication
 
-from maze import Maze
+from Maze import Maze
 from view import View
 from Maze_Controller import Controller
 

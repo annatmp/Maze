@@ -260,8 +260,14 @@ class Maze:
     def get_start(self):
         return self.start
 
+    def get_start_position(self):
+        return self.start.get_position()
+
     def get_end(self):
         return self.end
+
+    def get_end_position(self):
+        return self.end.get_position()
 
     def print(self):
         printer = Maze_printer(self.cells, self.start,self.end)
