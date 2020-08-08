@@ -1,6 +1,6 @@
 from enum import Enum
 from collections import OrderedDict
-import maze
+import Maze
 from Maze_Exceptions import Invalid_Direction_Exception, No_Solution_Found_Exception
 
 
@@ -23,10 +23,13 @@ class Maze_Walk:
         self.valid_path = []
         self.path = []
         self.visited = set()
+        self.visited.add(start)
         self.current = 0
+        self.step_count = 0
 
         self.path.append({self.CELL:start,
                           self.STATUS: Visit_Status.START})
+
         self.valid_path.append(start)
 
     def get_amount_valid_steps(self):
@@ -51,7 +54,7 @@ class Maze_Walk:
 
         self.path.append({self.CELL: new_position,
                           self.STATUS: Visit_Status.JUNCTION,
-                          self.DIRECTION: maze.Maze.ADJACENT_EDGES[wrong_step[self.DIRECTION]]})
+                          self.DIRECTION: Maze.Maze.ADJACENT_EDGES[wrong_step[self.DIRECTION]]})
 
 
 
@@ -64,7 +67,7 @@ class Maze_Walk:
         """
 
 
-        if not direction in maze.Maze.ADJACENT_EDGES:
+        if not direction in Maze.Maze.ADJACENT_EDGES:
             raise Invalid_Direction_Exception("{} is not a valid direction".format(direction))
 
         self.valid_path.append(obj)
@@ -74,9 +77,14 @@ class Maze_Walk:
                          self.DIRECTION: direction})
         self.visited.add(obj)
 
+        self.step_count += 1
+
     def get_current(self):
         current = self.path[-1][self.CELL]
         return current
+
+    def get_step_count(self):
+        return self.step_count
 
     def get_valid_path(self):
         return self.valid_path

@@ -1,8 +1,9 @@
-from maze import Maze
+from Maze import Maze
 import random
 from Cell import Cell
 from Maze_Exceptions import No_Solution_Found_Exception
 from Maze_Walk import Maze_Walk
+
 
 def get_possible_directions(cell: Cell):
     walls = cell.get_walls()
@@ -16,7 +17,6 @@ class Maze_Solver:
 
         self.maze = maze
         self.walker = Maze_Walk(self.maze.get_start())
-
 
     def get_not_visited_neighbours_by_directions(self, cell, directions):
 
@@ -37,7 +37,6 @@ class Maze_Solver:
 
 class Random_Solver(Maze_Solver):
 
-    SOLVING_ALGORITHMS = ["random"]
 
     def __init__(self,maze:Maze):
         super(Random_Solver, self).__init__(maze)
@@ -46,15 +45,9 @@ class Random_Solver(Maze_Solver):
 
     def solve(self):
         """
-        random maze solving, backtracks when hitting a wall. Stores the "dead" ends
+        random maze solving, backtracks when hitting a wall
         UNINFORMED!
         """
-        path = []
-
-
-        # get the details from the maze
-        start = self.maze.get_start()
-        assert(isinstance(start,Cell))
 
         #set start as the first cell in the path
 
@@ -63,10 +56,11 @@ class Random_Solver(Maze_Solver):
             current = self.walker.get_current()
             possible_directions = get_possible_directions(current)
 
-            if len(possible_directions) == 1 and not self.walker.is_at_start():
+            if len(possible_directions) == 1 and not self.walker.get_step_count() == 0:
                 # if we are not at the start and there is only one way to go, we are in a dead end.
                 self.walker.turn_back()
                 move()
+
             else:
                 #check if any of the direction is a dead end
                 valid_neighbours = self.get_not_visited_neighbours_by_directions(current, possible_directions)
